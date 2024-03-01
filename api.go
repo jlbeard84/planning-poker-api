@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -12,7 +13,31 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type VoteEvent struct {
+	client *Client
+	vote   uint16
+}
+
+type Client struct {
+	id         uint32
+	connection *websocket.Conn
+	manager    *Manager
+}
+
+type Manager struct {
+	clients ClientList
+}
+
+type ClientList map[*Client]bool
+
+func serveSockets(w http.ResponseWriter, r *http.Request) {
+	log.Println("New Connection")
+}
+
 func main() {
+
+	http.Handle("/ws", http.HandlerFunc(serveSockets))
+
 	http.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
 		conn, _ := upgrader.Upgrade(w, r, nil) // error ignored for sake of simplicity
 
